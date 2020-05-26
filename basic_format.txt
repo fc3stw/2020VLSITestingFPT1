@@ -1,0 +1,8 @@
+#######################################################
+basic format definition
+test vector format
+    v1: n bits
+    v2: 1 bit
+los with vector vec
+    v1: cktin[i] = vec[i] for i in range(0, n)
+    v2: cktin[i+1] = vec[i] for i in range(0, n-1), cktin[0] = vec[n]
