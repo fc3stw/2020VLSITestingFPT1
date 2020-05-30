@@ -214,6 +214,12 @@ void ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
       } // if  gate input fault
     } // if fault is active
 
+    // n-detect
+    // if the fault is detected, undo the detection count if the fault::detected_time < atpg::detected_num
+    if(f->detect == true){
+      f->detected_time++;
+      if(f->detected_time < detected_num) f->detect = false;
+    }
 
     /*
      * fault simulation of a packet
@@ -266,6 +272,12 @@ void ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
       for (i = 0; i < num_of_fault; i++) {
         if (fault_detected[i] == 1) {
           simulated_fault_list[i]->detect = TRUE;
+          // n-detect
+          // if the fault is detected, undo the detection count if the fault::detected_time < atpg::detected_num
+          if(simulated_fault_list[i]->detect == true){
+            simulated_fault_list[i]->detected_time++;
+            if(simulated_fault_list[i]->detected_time < detected_num) simulated_fault_list[i]->detect = false;
+          }
         }
       }
       num_of_fault = 0;  // reset the counter of faults in a packet
