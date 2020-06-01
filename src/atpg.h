@@ -97,6 +97,13 @@ class ATPG {
   /* defined in atpg.cpp */
   void test();
 
+  // defined in tdfatpg.cpp
+  void tdf_test();
+
+  // for tdf atpg
+  void set_tdfatpg();
+  bool get_tdfatpg() const {return tdf_atpg;}
+
  private:
 
   /* alias declaration */
@@ -209,6 +216,19 @@ class ATPG {
   void unmark_propagate_tree(nptr);
   int set_uniquely_implied_value(fptr);
   int backward_imply(wptr, const int &);
+
+  // defined in tdfpodem.cpp
+  int gen_tdf_vector(const fptr fault, int &current_backtracks);
+  int tdf_podem(const fptr fault, int &current_backtracks);
+  int tdf_podem_activate(const fptr fault, int &current_backtracks);
+  void reverse_fault_type(const fptr fault);
+  void merge_tdf_vectors(const vector<int> &v1, const vector<int> &v2);
+  bool is_activated(const fptr fault);
+  void print_vec(const vector<int> &vec, bool two_pat);
+  vector<int> tdf_vec;
+
+  // used in main.cpp
+  bool tdf_atpg;
 
   /* declared in display.cpp */
   void display_line(fptr);

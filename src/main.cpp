@@ -36,6 +36,11 @@ int main(int argc, char *argv[]) {
       atpg.set_tdfsim_only(true);
       i += 2;
     }
+    // for tdf atpg
+    else if(strcmp(argv[i], "-tdfatpg") == 0){
+      atpg.set_tdfatpg();
+      i++;
+    }
       // for N-detect fault simulation
     else if (strcmp(argv[i], "-ndet") == 0) {
       atpg.detected_num = atoi(argv[i + 1]);
@@ -76,11 +81,13 @@ int main(int argc, char *argv[]) {
   atpg.create_dummy_gate(); //init_flist.cpp
   atpg.timer(stdout, "for creating dummy nodes");
 
-  if (!atpg.get_tdfsim_only()) atpg.generate_fault_list(); //init_flist.cpp
+  // if (!atpg.get_tdfsim_only()) atpg.generate_fault_list(); //init_flist.cpp
+  if (!atpg.get_tdfsim_only() && !atpg.get_tdfatpg()) atpg.generate_fault_list(); //init_flist.cpp
   else atpg.generate_tdfault_list();
   atpg.timer(stdout, "for generating fault list");
 
-  atpg.test(); //atpg.cpp
+  if(atpg.get_tdfatpg()) atpg.tdf_test(); // tdfatpg.cpp
+  else atpg.test(); //atpg.cpp
   if (!atpg.get_tdfsim_only())atpg.compute_fault_coverage(); //init_flist.cpp
   atpg.timer(stdout, "for test pattern generation");
   exit(EXIT_SUCCESS);
@@ -114,4 +121,8 @@ void ATPG::set_total_attempt_num(const int &i) {
 
 void ATPG::set_backtrack_limit(const int &i) {
   this->backtrack_limit = i;
+}
+
+void ATPG::set_tdfatpg(){
+  this->tdf_atpg = true;
 }
