@@ -79,9 +79,7 @@ void ATPG::sim() {
 void ATPG::evaluate(nptr n) {
   int old_value, new_value;
   int i, nin;
-
   old_value = n->owire.front()->value;
-
   /* decompose a multiple-input gate into multiple levels of two-input gates
    * then look up the truth table of each two-input gate
    */
@@ -122,10 +120,11 @@ void ATPG::evaluate(nptr n) {
     n->owire.front()->set_changed();
     n->owire.front()->value = new_value;
   }
+  // cout<<"end eval"<<endl;
 }/* end of evaluate */
 
 int ATPG::ctoi(const char &c) {
-  if (c == '2') return (2);
+  if (c == 'U') return (2);
   if (c == '1') return (1);
   if (c == '0') return (0);
 }

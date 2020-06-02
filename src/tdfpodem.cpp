@@ -45,8 +45,8 @@ int ATPG::gen_tdf_vector(const fptr fault, int &current_backtracks)
   merge_tdf_vectors(v1, v2);
   if(tdf_vec.empty()) return FALSE;
   // random fill
-  for(int i = 0; i<tdf_vec.size(); i++){
-    if(tdf_vec[i]==U) tdf_vec[i] = rand() % 2;
+  for(int &b : tdf_vec){
+    // if(b==U) b = rand() % 2;
   }
   print_vec(tdf_vec, true);
   return TRUE;
@@ -381,7 +381,7 @@ bool ATPG::is_activated(const fptr fault)
   } else { // if fault is GUT gate input
     faulty_wire = fault->node->iwire[fault->index];
   }
-  return (faulty_wire->value != U);
+  return (faulty_wire->value != U) && (faulty_wire->value != fault->fault_type);
 }
 
 void ATPG::print_vec(const vector<int> &vec, bool two_pat)

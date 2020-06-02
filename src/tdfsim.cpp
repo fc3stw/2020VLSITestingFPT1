@@ -33,7 +33,6 @@ void ATPG::transition_delay_fault_simulation(int &total_detect_num) {
 void ATPG::tdfault_sim_a_vector(const string &vec, int &num_of_current_detect) {
   int i, nckt;
   fptr f;
-
   for (i = 0; i < cktin.size(); i++) {
     cktin[i]->value = ctoi(vec[i]);
   }

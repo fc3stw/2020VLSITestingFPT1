@@ -45,6 +45,7 @@ void ATPG::tdf_test() {
 
     /* test generation mode */
     /* Figure 5 in the PODEM paper */
+    int iter = 0;
     while (fault_under_test != nullptr) {
         switch (gen_tdf_vector(fault_under_test, current_backtracks)) {
             case TRUE:
@@ -85,14 +86,25 @@ void ATPG::tdf_test() {
         }
         fault_under_test->test_tried = true;
         fault_under_test = nullptr;
+        bool all_tried = true;
         for (fptr fptr_ele: flist_undetect) {
             if (!fptr_ele->test_tried) {
                 fault_under_test = fptr_ele;
+                all_tried = false;
                 break;
             }
         }
         total_no_of_backtracks += current_backtracks; // accumulate number of backtracks
         no_of_calls++;
+        // retry for another iteration
+        if(all_tried){
+            for(fptr fptr_ele: flist_undetect){
+                fptr_ele->test_tried = false;
+            }
+            iter++;
+            fault_under_test = flist_undetect.front();
+        }
+        if(iter == detected_num) break;
     }
 
     display_undetect();
