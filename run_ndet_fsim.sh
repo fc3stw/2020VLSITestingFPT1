@@ -1,0 +1,9 @@
+./atpg -tdfsim ../tdf_patterns/c17.pat ../sample_circuits/c17.ckt -ndet 3 | tee ../log/fsim_c17.log
+./atpg -tdfsim ../tdf_patterns/c432.pat ../sample_circuits/c432.ckt -ndet 3 | tee ../log/fsim_c432.log
+./atpg -tdfsim ../tdf_patterns/c499.pat ../sample_circuits/c499.ckt -ndet 3 | tee ../log/fsim_c499.log
+./atpg -tdfsim ../tdf_patterns/c880.pat ../sample_circuits/c880.ckt -ndet 3 | tee ../log/fsim_c880.log
+./atpg -tdfsim ../tdf_patterns/c1355.pat ../sample_circuits/c1355.ckt -ndet 3 | tee ../log/fsim_c1355.log
+./atpg -tdfsim ../tdf_patterns/c2670.pat ../sample_circuits/c2670.ckt -ndet 3 | tee ../log/fsim_c2670.log
+./atpg -tdfsim ../tdf_patterns/c3540.pat ../sample_circuits/c3540.ckt -ndet 3 | tee ../log/fsim_c3540.log
+./atpg -tdfsim ../tdf_patterns/c6288.pat ../sample_circuits/c6288.ckt -ndet 3 | tee ../log/fsim_c6288.log
+./atpg -tdfsim ../tdf_patterns/c7552.pat ../sample_circuits/c7552.ckt -ndet 3 | tee ../log/fsim_c7552.log
