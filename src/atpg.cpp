@@ -120,7 +120,8 @@ ATPG::ATPG() {
     this->in_vector_no = 0;         /* number of test vectors generated */
 
     // for tdfatpg
-    tdf_atpg = false;
+    tdf_atpg_flag = false;
+    compress_flag = false;
 }
 
 /* constructor of WIRE */

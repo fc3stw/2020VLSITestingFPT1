@@ -350,6 +350,7 @@ ATPG::wptr ATPG::find_pi_assignment(const wptr object_wire, const int &object_le
 
   /* if PI, assign the same value as objective Fig 9.1, 9.2 */
   if (object_wire->is_input()) {
+    if(object_wire->value!=U) return nullptr;
     object_wire->value = object_level;
     return (object_wire);
   }
