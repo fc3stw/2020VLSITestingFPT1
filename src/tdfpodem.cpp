@@ -421,15 +421,7 @@ bool ATPG::conflict(int b1, int b2)
 
 bool ATPG::is_activated(const fptr fault)
 {
-    wptr faulty_wire;
-    if (fault->io == GO)
-    {                                             // if fault is on GUT gate output
-        faulty_wire = fault->node->owire.front(); // w is GUT output wire
-    }
-    else
-    { // if fault is GUT gate input
-        faulty_wire = fault->node->iwire[fault->index];
-    }
+    wptr faulty_wire = fault->get_faulty_wire();
     return (faulty_wire->value != U) && (faulty_wire->value != fault->fault_type);
 }
 

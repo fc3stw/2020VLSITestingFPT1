@@ -16,6 +16,7 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
     // the last bit represents an extra shift-in bit for LOS
     vector<int> tmp_vec = tdf_vec;
     while(true){
+        tmp_vec = tdf_vec;
         // select secondary fault
         // TODO
         second_fault = get_second_fault();
@@ -50,7 +51,9 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
         }
         sim();
         // expand v1
+        reverse_fault_type(second_fault);
         gen_result = tdf_podem_activate(second_fault, current_backtracks, false);
+        reverse_fault_type(second_fault);
         if(gen_result!=TRUE) continue;
         // collect v1 on tmp_vec
         i = 0;
@@ -65,5 +68,6 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
 // TODO
 ATPG::fptr ATPG::get_second_fault()
 {
+    // fault list: flist_undetect
     return nullptr;
 }

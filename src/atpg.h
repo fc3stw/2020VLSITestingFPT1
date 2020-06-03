@@ -100,9 +100,11 @@ class ATPG {
   // defined in tdfatpg.cpp
   void tdf_test();
 
-  // for tdf atpg
+  // for tdf atpg and test compression
   void set_tdfatpg();
-  bool get_tdfatpg() const {return tdf_atpg;}
+  bool get_tdfatpg() const {return tdf_atpg_flag;}
+  void set_compress();
+  bool get_compress() const {return compress_flag;}
 
  private:
 
@@ -219,16 +221,19 @@ class ATPG {
 
   // defined in tdfpodem.cpp
   int gen_tdf_vector(const fptr fault, int &current_backtracks);
-  int tdf_podem(const fptr fault, int &current_backtracks);
-  int tdf_podem_activate(const fptr fault, int &current_backtracks);
+  int tdf_podem(const fptr fault, int &current_backtracks, bool clear_input);
+  int tdf_podem_activate(const fptr fault, int &current_backtracks, bool clear_input);
   void reverse_fault_type(const fptr fault);
-  void merge_tdf_vectors(const vector<int> &v1, const vector<int> &v2);
+  bool conflict(int b1, int b2);
   bool is_activated(const fptr fault);
   void print_vec(const vector<int> &vec, bool two_pat);
+  void dynamic_test_compress(int &current_backtracks);
+  fptr get_second_fault();
   vector<int> tdf_vec;
 
   // used in main.cpp
-  bool tdf_atpg;
+  bool tdf_atpg_flag;
+  bool compress_flag;
 
   /* declared in display.cpp */
   void display_line(fptr);
@@ -347,5 +352,10 @@ class ATPG {
     int to_swlist;             /* index to the sort_wlist[] */
     int fault_no;              /* fault index */
     int detected_time{};         /* for N-detect */
+    wptr get_faulty_wire()
+    {
+      if (this->io == GO) return this->node->owire.front();
+      else return this->node->iwire[this->index];
+    }
   }; // class FAULT
 };// class ATPG
