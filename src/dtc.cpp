@@ -2,13 +2,12 @@
 /*           This is the podem test pattern generator for tdf atpg    */
 /*                                                                    */
 /*           Author: Pei-Chen(Jenny) Yen                              */
-/*           last update : 06/01/2020                                 */
+/*           last update : 06/04/2020                                 */
 /**********************************************************************/
 #include "atpg.h"
 
 void ATPG::dynamic_test_compress(int &current_backtracks)
 {
-    forward_list<fptr>::iterator fault_it = flist_undetect.begin();
     fptr second_fault;
     int gen_result;
     int i;
@@ -67,7 +66,66 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
 
 // TODO
 ATPG::fptr ATPG::get_second_fault()
+// fptr ATPG::get_second_fault()
 {
     // fault list: flist_undetect
-    return nullptr;
+    int i = 0;
+    int j = 0;
+    fptr second_fault;
+    bool _fail;
+    vector<int> tmp_vec = tdf_vec;
+
+    for(fptr fault : flist_undetect){
+    	_fail = false;
+
+    	// cout<<"get faulty wire"<<endl;
+    	wptr faulty_w = fault->get_faulty_wire();
+
+    	// cout<<"load v1"<<endl;
+    	// load v1
+    	i = 0;
+    	for(wptr pi : cktin){
+        	pi->value = tmp_vec[i];
+        	pi->set_changed();
+        	i++;
+    	}
+    	// cout<<"sim v1"<<endl;
+    	sim();
+    	// cout<<"check conflict"<<endl;
+    	_fail = conflict(fault->fault_type, faulty_w->value);
+    	if(_fail)	continue;
+
+    	// cout<<"load v2"<<endl;
+		// load v2
+		i = 0;
+		for(wptr pi : cktin){
+    		if(i == 0) pi->value = tmp_vec.back();
+    		else pi->value = tmp_vec[i-1];
+    		pi->set_changed();
+    		i++;
+		}
+		// cout<<"sim v2"<<endl;
+		sim();
+
+		// cout<<"check conflict"<<endl;
+		reverse_fault_type(fault);
+		_fail |= conflict(fault->fault_type, faulty_w->value);
+		reverse_fault_type(fault);
+		if(_fail)	continue;
+
+		// cout<<"trace x path"<<endl;
+		_fail |= (!trace_unknown_path(faulty_w));
+		if(_fail)	continue;
+
+		if(_fail == false){
+			second_fault = fault;
+			break;
+		}
+    }
+
+    if(_fail == true)
+    	return nullptr;
+    else
+    	return second_fault;
+
 }
