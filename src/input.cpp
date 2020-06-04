@@ -170,7 +170,7 @@ void ATPG::input(const string &infile) {
   }
   while (!file.eof() && !file.bad()) {
     getline(file, line); // get a line from the file
-    lineno++;
+    // lineno++;
     parse_line(line);
     //cout << targc << endl;
     for (int i = 0; !targv[i].empty(); i++) {
@@ -179,7 +179,7 @@ void ATPG::input(const string &infile) {
     if (targv[0].empty()) continue;
     if (targv[0] == "name") {
       if (targc != 2) {
-        //cout << targc << endl;
+        // cout << targc << endl;
         error("Wrong Input Format!");
       }
       continue;

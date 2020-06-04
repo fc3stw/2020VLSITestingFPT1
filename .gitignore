@@ -1,0 +1,5 @@
+sftp*
+sample_circuits/
+tdf_patterns/
+./src/atpg
+./src/*.o

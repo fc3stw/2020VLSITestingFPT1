@@ -55,7 +55,10 @@ int ATPG::gen_tdf_vector(const fptr fault, int &current_backtracks)
     for (int &b : tdf_vec){
         if (b == U) b = rand() % 2;
     }
-    print_vec(tdf_vec, true);
+
+    if(!get_compress()){ 
+        print_vec(tdf_vec, true);
+    }
     return TRUE;
 }
 

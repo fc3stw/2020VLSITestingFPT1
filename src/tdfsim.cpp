@@ -30,7 +30,7 @@ void ATPG::transition_delay_fault_simulation(int &total_detect_num) {
   }
 }// fault_simulate_vectors
 
-void ATPG::tdfault_sim_a_vector(const string &vec, int &num_of_current_detect) {
+bool ATPG::tdfault_sim_a_vector(const string &vec, int &num_of_current_detect) {
   int i, nckt;
   fptr f;
   for (i = 0; i < cktin.size(); i++) {
@@ -55,12 +55,12 @@ void ATPG::tdfault_sim_a_vector(const string &vec, int &num_of_current_detect) {
       f->activate = FALSE;
   }
 
-  tdfault_sim_a_vector2(vec, num_of_current_detect);
+  return tdfault_sim_a_vector2(vec, num_of_current_detect);
 
 }
 
 /* fault simulate a single test vector */
-void ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) {
+bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) {
   wptr w, faulty_wire;
   /* array of 16 fptrs, which points to the 16 faults in a simulation packet  */
   fptr simulated_fault_list[num_of_pattern];
@@ -68,6 +68,9 @@ void ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
   int fault_type;
   int i, start_wire_index, nckt;
   int num_of_fault;
+
+  // for STC
+  bool redundant_pattern = true;
 
   num_of_fault = 0; // counts the number of faults in a packet
 
@@ -215,9 +218,11 @@ void ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
 
     // n-detect
     // if the fault is detected, undo the detection count if the fault::detected_time < atpg::detected_num
-    if(f->detect == TRUE){
+    // and the pattern is not redundant
+    if(f->detect == true){
       f->detected_time++;
-      if(f->detected_time < detected_num) f->detect = FALSE;
+      redundant_pattern = false;
+      if(f->detected_time < detected_num) f->detect = false;
     }
 
     /*
@@ -273,9 +278,11 @@ void ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
           simulated_fault_list[i]->detect = TRUE;
           // n-detect
           // if the fault is detected, undo the detection count if the fault::detected_time < atpg::detected_num
-          if(simulated_fault_list[i]->detect == TRUE){
+          // and the pattern is not redundant
+          if(simulated_fault_list[i]->detect == true){
             simulated_fault_list[i]->detected_time++;
-            if(simulated_fault_list[i]->detected_time < detected_num) simulated_fault_list[i]->detect = FALSE;
+            redundant_pattern = false;
+            if(simulated_fault_list[i]->detected_time < detected_num) simulated_fault_list[i]->detect = false;
           }
         }
       }
@@ -301,6 +308,8 @@ void ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
           return false;
         }
       });
+
+  return redundant_pattern;
 
 }/* end of fault_sim_a_vector */
 

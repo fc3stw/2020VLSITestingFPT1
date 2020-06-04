@@ -88,8 +88,8 @@ class ATPG {
   /*defined in tdfsim.cpp*/
   void generate_tdfault_list();
   void transition_delay_fault_simulation(int &);
-  void tdfault_sim_a_vector(const string &, int &);
-  void tdfault_sim_a_vector2(const string &, int &);
+  bool tdfault_sim_a_vector(const string &, int &);
+  bool tdfault_sim_a_vector2(const string &, int &);
   int num_of_tdf_fault{};
   int detected_num{};
   bool get_tdfsim_only() { return tdfsim_only; }
@@ -230,6 +230,9 @@ class ATPG {
   void dynamic_test_compress(int &current_backtracks);
   fptr get_second_fault();
   vector<int> tdf_vec;
+
+  // defined in stc.cpp
+  void static_test_compress();
 
   // used in main.cpp
   bool tdf_atpg_flag;

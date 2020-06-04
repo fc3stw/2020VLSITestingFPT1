@@ -54,6 +54,9 @@ void ATPG::tdf_test() {
                 for (int val : tdf_vec) {
                     vec.push_back(itoc(val));
                 }
+                // add vector into test vector list
+                vectors.push_back(vec);
+
                 /*by defect, we want only one pattern per fault */
                 /*run a fault simulation, drop ALL detected faults */
                 if (total_attempt_num == 1) {
@@ -116,6 +119,10 @@ void ATPG::tdf_test() {
     // fprintf(stdout, "#number of calling podem1 = %d\n", no_of_calls);
     // fprintf(stdout, "\n");
     // fprintf(stdout, "#total number of backtracks = %d\n", total_no_of_backtracks);
+
+    // static compression
+    if (compress_flag) {
+        static_test_compress();
+    }
+
 }/* end of test */
-
-
