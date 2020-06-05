@@ -30,7 +30,7 @@ void ATPG::transition_delay_fault_simulation(int &total_detect_num) {
   }
 }// fault_simulate_vectors
 
-bool ATPG::tdfault_sim_a_vector(const string &vec, int &num_of_current_detect) {
+bool ATPG::tdfault_sim_a_vector(const string &vec, int &num_of_current_detect, bool fault_drop, int pattern_index) {
   int i, nckt;
   fptr f;
   for (i = 0; i < cktin.size(); i++) {
@@ -55,12 +55,12 @@ bool ATPG::tdfault_sim_a_vector(const string &vec, int &num_of_current_detect) {
       f->activate = FALSE;
   }
 
-  return tdfault_sim_a_vector2(vec, num_of_current_detect);
+  return tdfault_sim_a_vector2(vec, num_of_current_detect, fault_drop, pattern_index);
 
 }
 
 /* fault simulate a single test vector */
-bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) {
+bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect, bool fault_drop, int pattern_index) {
   wptr w, faulty_wire;
   /* array of 16 fptrs, which points to the 16 faults in a simulation packet  */
   fptr simulated_fault_list[num_of_pattern];
@@ -223,6 +223,10 @@ bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
       f->detected_time++;
       redundant_pattern = false;
       if(f->detected_time < detected_num) f->detect = false;
+      // for essential fault
+      if(!fault_drop && (f->detected_time <= detected_num)) {
+        f->pattern.push_back(pattern_index);
+      }
     }
 
     /*
@@ -279,10 +283,14 @@ bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
           // n-detect
           // if the fault is detected, undo the detection count if the fault::detected_time < atpg::detected_num
           // and the pattern is not redundant
-          if(simulated_fault_list[i]->detect == true){
+          if(simulated_fault_list[i]->detect == TRUE){
             simulated_fault_list[i]->detected_time++;
             redundant_pattern = false;
             if(simulated_fault_list[i]->detected_time < detected_num) simulated_fault_list[i]->detect = false;
+            // for essential fault
+            if(!fault_drop && (simulated_fault_list[i]->detected_time <= detected_num)) {
+              simulated_fault_list[i]->pattern.push_back(pattern_index);
+            }
           }
         }
       }
@@ -292,22 +300,24 @@ bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect) 
   } // end loop. for f = flist
 
   /* fault dropping  */
-  flist_undetect.remove_if(
-      [&](const fptr fptr_ele) {
-        if (fptr_ele->detect == TRUE) {
-          string IO;
-          /*if(fptr_ele->io == GO) IO = "GO";
-          else IO = "GI";
-          if(fptr_ele->fault_type == STR)
-            cout << "fault "<<  fptr_ele->fault_no<< ": STR at wire-"<< sort_wlist[fptr_ele->to_swlist]->name<< ", "<< IO<< " of "<< fptr_ele->node->name <<endl;
-          else
-            cout << "fault "<<  fptr_ele->fault_no<< ": STF at wire- "<< sort_wlist[fptr_ele->to_swlist]->name<< ", "<< IO<< " of "<< fptr_ele->node->name <<endl;*/
-          num_of_current_detect += fptr_ele->eqv_fault_num;
-          return true;
-        } else {
-          return false;
-        }
-      });
+  if (fault_drop) {
+    flist_undetect.remove_if(
+        [&](const fptr fptr_ele) {
+          if (fptr_ele->detect == TRUE) {
+            string IO;
+            /*if(fptr_ele->io == GO) IO = "GO";
+            else IO = "GI";
+            if(fptr_ele->fault_type == STR)
+              cout << "fault "<<  fptr_ele->fault_no<< ": STR at wire-"<< sort_wlist[fptr_ele->to_swlist]->name<< ", "<< IO<< " of "<< fptr_ele->node->name <<endl;
+            else
+              cout << "fault "<<  fptr_ele->fault_no<< ": STF at wire- "<< sort_wlist[fptr_ele->to_swlist]->name<< ", "<< IO<< " of "<< fptr_ele->node->name <<endl;*/
+            num_of_current_detect += fptr_ele->eqv_fault_num;
+            return true;
+          } else {
+            return false;
+          }
+        });
+  }
 
   return redundant_pattern;
 

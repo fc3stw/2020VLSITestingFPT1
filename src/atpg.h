@@ -88,8 +88,8 @@ class ATPG {
   /*defined in tdfsim.cpp*/
   void generate_tdfault_list();
   void transition_delay_fault_simulation(int &);
-  bool tdfault_sim_a_vector(const string &, int &);
-  bool tdfault_sim_a_vector2(const string &, int &);
+  bool tdfault_sim_a_vector(const string &, int &, bool = true, int = 0);
+  bool tdfault_sim_a_vector2(const string &, int &, bool = true, int = 0);
   int num_of_tdf_fault{};
   int detected_num{};
   bool get_tdfsim_only() { return tdfsim_only; }
@@ -355,6 +355,8 @@ class ATPG {
     int to_swlist;             /* index to the sort_wlist[] */
     int fault_no;              /* fault index */
     int detected_time{};         /* for N-detect */
+    // for stc
+    vector<int> pattern;
     wptr get_faulty_wire()
     {
       if (this->io == GO) return this->node->owire.front();
