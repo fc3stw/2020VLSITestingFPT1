@@ -5,10 +5,11 @@
 /*           last update : 06/04/2020                                 */
 /**********************************************************************/
 #include "atpg.h"
+#include <cmath>
 
 void ATPG::dynamic_test_compress(int &current_backtracks)
 {
-    int max_fault = 1000;
+    int max_fault = 2000;
     int num_tried_fault = 0;
     fptr second_fault;
     int gen_result;
@@ -73,12 +74,22 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
 
 // TODO
 ATPG::fptr ATPG::get_second_fault()
-// fptr ATPG::get_second_fault()
 {
     int i = 0;
     int j = 0;
     bool _fail;
     vector<int> tmp_vec = tdf_vec;
+    // analyze x-rate
+    // double x_rate = 0.;
+    // for(int b: tmp_vec){
+    //     if(b==U) x_rate += 1.;
+    // }
+    // x_rate = x_rate/(double)tmp_vec.size();
+    // double alpha = 3.;
+    // double slope = 0.15;
+    // double choose_prob = 100.*(0.1-slope*(1.-x_rate));
+    // double choose_prob = 100.*exp(-alpha*(1.-x_rate));
+    // if(choose_prob < 0.01) return nullptr;
 
     for(fptr fault : flist_undetect){
     	_fail = false;
@@ -87,7 +98,9 @@ ATPG::fptr ATPG::get_second_fault()
             // cout<<"fault already tried"<<endl;
             continue;
         }
-        int choose = rand() % 10;
+        // int choose = rand() % 100;
+        int choose = rand() % 40;
+        // if(choose > choose_prob) continue;
         if(choose != 0) continue;
         fault->dtc_tried = true;
 
