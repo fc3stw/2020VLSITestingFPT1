@@ -355,8 +355,10 @@ class ATPG {
     int to_swlist;             /* index to the sort_wlist[] */
     int fault_no;              /* fault index */
     int detected_time{};         /* for N-detect */
+    
     // for stc
     vector<int> pattern;
+    bool dtc_tried;
     wptr get_faulty_wire()
     {
       if (this->io == GO) return this->node->owire.front();
