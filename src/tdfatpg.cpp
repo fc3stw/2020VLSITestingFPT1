@@ -19,30 +19,6 @@ void ATPG::tdf_test() {
 
     fptr fault_under_test = flist_undetect.front();
 
-    /* stuck-at fault sim mode */
-    if (fsim_only) {
-        fault_simulate_vectors(total_detect_num);
-        in_vector_no += vectors.size();
-        display_undetect();
-        fprintf(stdout, "\n");
-        return;
-    }// if fsim only
-
-    /* transition fault sim mode */
-    if (tdfsim_only) {
-        transition_delay_fault_simulation(total_detect_num);
-        in_vector_no += vectors.size();
-        display_undetect();
-
-        printf("\n# Result:\n");
-        printf("-----------------------\n");
-        printf("# total transition delay faults: %d\n", num_of_tdf_fault);
-        printf("# total detected faults: %d\n", total_detect_num);
-        printf("# fault coverage: %lf %\n", (double) total_detect_num / (double) num_of_tdf_fault * 100);
-        return;
-    }// if fsim only
-
-
     /* test generation mode */
     /* Figure 5 in the PODEM paper */
     int iter = 0;
@@ -56,7 +32,7 @@ void ATPG::tdf_test() {
                 }
                 // add vector into test vector list
                 vectors.push_back(vec);
-
+                
                 /*by defect, we want only one pattern per fault */
                 /*run a fault simulation, drop ALL detected faults */
                 if (total_attempt_num == 1) {
@@ -80,11 +56,14 @@ void ATPG::tdf_test() {
                 }
                 in_vector_no++;
                 break;
-            case FALSE:fault_under_test->detect = REDUNDANT;
+            case FALSE:
+                fault_under_test->detect = REDUNDANT;
+                flist_undetect.remove(fault_under_test);
                 no_of_redundant_faults++;
                 break;
 
-            case MAYBE:no_of_aborted_faults++;
+            case MAYBE:
+                no_of_aborted_faults++;
                 break;
         }
         fault_under_test->test_tried = true;
@@ -105,6 +84,7 @@ void ATPG::tdf_test() {
                 fptr_ele->test_tried = false;
             }
             iter++;
+            if(flist_undetect.empty()) break;
             fault_under_test = flist_undetect.front();
         }
         if(iter == detected_num) break;
@@ -124,5 +104,15 @@ void ATPG::tdf_test() {
     if (compress_flag) {
         static_test_compress();
     }
+    
+    // tdfsim
+    total_detect_num = 0;
+    flist_undetect.clear();
+    generate_tdfault_list();
+    transition_delay_fault_simulation(total_detect_num, false);
+    fprintf(stdout, "\n# Result:\n");
+    fprintf(stdout, "-----------------------\n");
+    fprintf(stdout, "# number of test vectors = %d\n", in_vector_no);
+    fprintf(stdout, "# fault coverage: %lf %\n\n", (double) total_detect_num / (double) num_of_tdf_fault * 100);
 
 }/* end of test */

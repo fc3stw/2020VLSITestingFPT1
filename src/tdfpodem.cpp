@@ -34,6 +34,7 @@ int ATPG::gen_tdf_vector(const fptr fault, int &current_backtracks)
         i++;
     }
     sim();
+
     // complete v1 to activate TDF
     reverse_fault_type(fault);
     gen_result = tdf_podem_activate(fault, current_backtracks, false);
@@ -287,11 +288,9 @@ int ATPG::tdf_podem_activate(const fptr fault, int &current_backtracks, bool cle
     {
     case TRUE: // if a  PI is assigned
         sim(); // Fig 7.3
-        wfault = fault_evaluate(fault);
-        if (wfault != nullptr)
-            forward_imply(wfault); // propagate fault effect
-        if (check_test())
-            find_test = true; // if fault effect reaches PO, done. Fig 7.10
+        if (is_activated(fault)){
+            find_test = true;
+        }
         break;
     case CONFLICT:
         no_test = true; // cannot achieve initial objective, no test
@@ -344,8 +343,7 @@ int ATPG::tdf_podem_activate(const fptr fault, int &current_backtracks, bool cle
                 no_test = true; //decision tree empty,  Fig 7.9
         }                       // no test possible
         sim();
-        if (is_activated(fault))
-        {
+        if (is_activated(fault)){
             find_test = true;
         }
     } // while (three conditions)

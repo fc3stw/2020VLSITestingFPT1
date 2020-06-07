@@ -151,5 +151,7 @@ ATPG::FAULT::FAULT() {
     this->to_swlist = 0;
     this->fault_no = 0;
     this->dtc_tried = false;
+    this->activate = FALSE;
+    this->detected_time = 0;
 }
 
