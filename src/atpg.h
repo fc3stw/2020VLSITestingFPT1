@@ -87,7 +87,7 @@ class ATPG {
 
   /*defined in tdfsim.cpp*/
   void generate_tdfault_list();
-  void transition_delay_fault_simulation(int &);
+  void transition_delay_fault_simulation(int &, bool verbose=true);
   bool tdfault_sim_a_vector(const string &, int &, bool = true, int = 0);
   bool tdfault_sim_a_vector2(const string &, int &, bool = true, int = 0);
   int num_of_tdf_fault{};

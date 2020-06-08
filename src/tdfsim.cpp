@@ -18,7 +18,7 @@
  * The list is linked by the pnext pointers */
 
 /* fault simulate a set of test vectors */
-void ATPG::transition_delay_fault_simulation(int &total_detect_num) {
+void ATPG::transition_delay_fault_simulation(int &total_detect_num, bool verbose) {
   int i;
   int current_detect_num = 0;
 
@@ -26,7 +26,7 @@ void ATPG::transition_delay_fault_simulation(int &total_detect_num) {
   for (i = vectors.size() - 1; i >= 0; i--) {
     tdfault_sim_a_vector(vectors[i], current_detect_num);
     total_detect_num += current_detect_num;
-    fprintf(stdout, "vector[%d] detects %d faults (%d)\n", i, current_detect_num, total_detect_num);
+    if(verbose) fprintf(stdout, "vector[%d] detects %d faults (%d)\n", i, current_detect_num, total_detect_num);
   }
 }// fault_simulate_vectors
 

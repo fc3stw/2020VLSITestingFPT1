@@ -93,7 +93,8 @@ int main(int argc, char *argv[]) {
 
   if(atpg.get_tdfatpg()) atpg.tdf_test(); // tdfatpg.cpp
   else atpg.test(); //atpg.cpp
-  if (!atpg.get_tdfsim_only())atpg.compute_fault_coverage(); //init_flist.cpp
+  // if (!atpg.get_tdfsim_only())atpg.compute_fault_coverage(); //init_flist.cpp
+  if (!atpg.get_tdfsim_only() && !atpg.get_tdfatpg())atpg.compute_fault_coverage(); //init_flist.cpp
   atpg.timer(stdout, "for test pattern generation");
   exit(EXIT_SUCCESS);
 }
