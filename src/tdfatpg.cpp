@@ -104,18 +104,21 @@ void ATPG::tdf_test() {
     if (compress_flag) {
         static_test_compress();
     }
-
-    // print all vectors
-    for (int i = vectors.size() - 1; i >= 0; i--) {
-		fprintf(stdout, "T\'%s\'\n", vectors[i].c_str());
-	}
-	in_vector_no = vectors.size();
     
     // tdfsim
     total_detect_num = 0;
     flist_undetect.clear();
     generate_tdfault_list();
     transition_delay_fault_simulation(total_detect_num, false);
+
+    // print all vectors
+    int num_pis = cktin.size();
+    for (int i = vectors.size() - 1; i >= 0; i--) {
+        vectors[i].insert(num_pis, " ");
+		fprintf(stdout, "T\'%s\'\n", vectors[i].c_str());
+	}
+	in_vector_no = vectors.size();
+
     fprintf(stdout, "\n# Result:\n");
     fprintf(stdout, "-----------------------\n");
     fprintf(stdout, "# number of test vectors = %d\n", in_vector_no);

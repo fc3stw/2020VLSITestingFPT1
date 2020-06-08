@@ -26,10 +26,16 @@ void ATPG::static_test_compress() {
 		// total_detect_num += current_detect_num;
 		// fprintf(stdout, "vector[%d] detects %d faults (%d)\n", i, current_detect_num, total_detect_num);
 		
-		if (redundant) {
-			// remove the redundant vector
-			vectors.erase(vectors.begin()+i);
-		} 
+		// if (redundant) {
+		// 	// remove the redundant vector
+		// 	vectors.erase(vectors.begin()+i);
+		// } 
+	}
+
+	for (fptr f: flist_undetect){
+		if (f->detect != TRUE) {
+			f->detect = REDUNDANT;			
+		}
 	}
 
 	// find essential fault
@@ -65,7 +71,7 @@ void ATPG::static_test_compress() {
 				f->detect = FALSE;
 				f->pattern.clear();
 			} else {
-				f->detect = REDUNDANT;
+				// f->detect = REDUNDANT;
 			}
 		}
 		for (int i = non_essential.size() - 1; i >= 0; i--) {
@@ -113,8 +119,9 @@ void ATPG::static_test_compress() {
 	// srand(time(NULL));
 	int iter = 0;
 	int remove_pattern = -1;
-	int converge = 0; 
-	while (converge<2) {
+	int converge = 0;
+	int conv_limit = 10;
+	while (converge < conv_limit) {
 		remove_pattern = 0;
 		gen_flist_undetect();
 
