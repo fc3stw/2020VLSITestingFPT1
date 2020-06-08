@@ -104,6 +104,12 @@ void ATPG::tdf_test() {
     if (compress_flag) {
         static_test_compress();
     }
+
+    // print all vectors
+    for (int i = vectors.size() - 1; i >= 0; i--) {
+		fprintf(stdout, "T\'%s\'\n", vectors[i].c_str());
+	}
+	in_vector_no = vectors.size();
     
     // tdfsim
     total_detect_num = 0;

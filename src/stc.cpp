@@ -140,10 +140,10 @@ void ATPG::static_test_compress() {
 	}
 	
 	// print vector
-	for (int i = vectors.size() - 1; i >= 0; i--) {
-		fprintf(stdout, "T\'%s\'\n", vectors[i].c_str());
-	}
-	in_vector_no = vectors.size();
+	// for (int i = vectors.size() - 1; i >= 0; i--) {
+	// 	fprintf(stdout, "T\'%s\'\n", vectors[i].c_str());
+	// }
+	// in_vector_no = vectors.size();
 
 	// end = time(NULL);
 	// cout << "time for ordering : " << end-start << endl;
