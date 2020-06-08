@@ -20,9 +20,8 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
     while(true){
         tmp_vec = tdf_vec;
         // select secondary fault
-        // TODO
         second_fault = get_second_fault();
-        // end TODO
+        
         // terminate dtc if no more fault to choose
         if(second_fault==nullptr) break;
         num_tried_fault++;
@@ -72,7 +71,6 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
     }
 }
 
-// TODO
 ATPG::fptr ATPG::get_second_fault()
 {
     int i = 0;

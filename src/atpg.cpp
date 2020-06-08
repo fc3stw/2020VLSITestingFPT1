@@ -102,7 +102,7 @@ void ATPG::test() {
 /* constructor of ATPG */
 ATPG::ATPG() {
     /* orginally assigned in tpgmain.c */
-    this->backtrack_limit = 20;     /* default value */
+    this->backtrack_limit = 100;     /* default value */
     this->total_attempt_num = 1;    /* default value */
     this->fsim_only = false;        /* flag to indicate fault simulation only */
     this->tdfsim_only = false;      /* flag to indicate tdfault simulation only */
@@ -122,6 +122,7 @@ ATPG::ATPG() {
     // for tdfatpg
     tdf_atpg_flag = false;
     compress_flag = false;
+    srand(0);
 }
 
 /* constructor of WIRE */

@@ -88,6 +88,8 @@ void ATPG::static_test_compress() {
 	vectors = non_essential;
 	vectors.insert(vectors.end(), essential.begin(), essential.end());		
 	
+	gen_flist_undetect();
+	
 	// end = time(NULL);
 	// cout << "time for essential fault : " << end-start << endl;
 	// start = time(NULL);
@@ -108,7 +110,7 @@ void ATPG::static_test_compress() {
 	}
 
 	// random order
-	srand(time(NULL));
+	// srand(time(NULL));
 	int iter = 0;
 	int remove_pattern = -1;
 	int converge = 0; 
