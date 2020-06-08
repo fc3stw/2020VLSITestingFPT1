@@ -233,6 +233,7 @@ class ATPG {
 
   // defined in stc.cpp
   void static_test_compress();
+  void gen_flist_undetect();
 
   // used in main.cpp
   bool tdf_atpg_flag;

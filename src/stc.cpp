@@ -17,7 +17,23 @@ void ATPG::static_test_compress() {
 		f->detect = false;
 		flist_undetect.push_front(f);	
 	}
+
+	// simulate test vectors in reverse order
+	total_detect_num = 0;
+	current_detect_num = 0;
+	for (int i = vectors.size() - 1; i >= 0; i--) {
+		bool redundant = tdfault_sim_a_vector(vectors[i], current_detect_num);
+		// total_detect_num += current_detect_num;
+		// fprintf(stdout, "vector[%d] detects %d faults (%d)\n", i, current_detect_num, total_detect_num);
+		
+		if (redundant) {
+			// remove the redundant vector
+			vectors.erase(vectors.begin()+i);
+		} 
+	}
+
 	// find essential fault
+	gen_flist_undetect();
 	vector<string> essential;
 	vector<string> non_essential = vectors;
 	bool find_essential = true;
@@ -77,18 +93,7 @@ void ATPG::static_test_compress() {
 	// start = time(NULL);
 
 	// step2 : reverse order + random order
-	// generate undetected fault list again
-	flist_undetect.clear();
-	for (auto pos = flist.cbegin(); pos != flist.cend(); ++pos) {
-		fptr f = (*pos).get();
-		if (f->detect != REDUNDANT) {
-			f->detected_time = 0;
-			f->detect = false;
-			flist_undetect.push_front(f);				
-		}
-	}
-	
-	// simulate test vectors in reverse order
+	// reverse order
 	total_detect_num = 0;
 	current_detect_num = 0;
 	for (int i = vectors.size() - 1; i >= 0; i--) {
@@ -109,13 +114,7 @@ void ATPG::static_test_compress() {
 	int converge = 0; 
 	while (converge<2) {
 		remove_pattern = 0;
-		flist_undetect.clear();
-		for (auto pos = flist.cbegin(); pos != flist.cend(); ++pos) {
-			fptr f = (*pos).get();
-			f->detected_time = 0;
-			f->detect = false;
-			flist_undetect.push_front(f);	
-		}
+		gen_flist_undetect();
 
 		vector<string> vectors_new;
 		while (!vectors.empty()) {
@@ -147,4 +146,16 @@ void ATPG::static_test_compress() {
 
 	// end = time(NULL);
 	// cout << "time for ordering : " << end-start << endl;
+}
+
+void ATPG::gen_flist_undetect() {
+	flist_undetect.clear();
+	for (auto pos = flist.cbegin(); pos != flist.cend(); ++pos) {
+		fptr f = (*pos).get();
+		if (f->detect != REDUNDANT) {
+			f->detected_time = 0;
+			f->detect = false;
+			flist_undetect.push_front(f);				
+		}
+	}
 }
