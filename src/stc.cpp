@@ -8,7 +8,7 @@ void ATPG::static_test_compress() {
 	int total_detect_num = 0;
 	int current_detect_num = 0;
 
-	// step1 : find essential test pattern
+	// step1 :reverse order sim and find essential test pattern
 	// generate undetected fault list again
 	flist_undetect.clear();
 	for (auto pos = flist.cbegin(); pos != flist.cend(); ++pos) {
@@ -19,75 +19,44 @@ void ATPG::static_test_compress() {
 	}
 
 	// simulate test vectors in reverse order
-	total_detect_num = 0;
-	current_detect_num = 0;
-	for (int i = vectors.size() - 1; i >= 0; i--) {
-		bool redundant = tdfault_sim_a_vector(vectors[i], current_detect_num);
-		// total_detect_num += current_detect_num;
-		// fprintf(stdout, "vector[%d] detects %d faults (%d)\n", i, current_detect_num, total_detect_num);
-		
-		// if (redundant) {
-		// 	// remove the redundant vector
-		// 	vectors.erase(vectors.begin()+i);
-		// } 
-	}
-
-	for (fptr f: flist_undetect){
-		if (f->detect != TRUE) {
-			f->detect = REDUNDANT;			
-		}
-	}
-
-	// find essential fault
-	gen_flist_undetect();
-	vector<string> essential;
+ 	vector<string> essential;
 	vector<string> non_essential = vectors;
 	bool find_essential = true;
 
 	int essential_fault = 0;
 
-	while (!flist_undetect.empty()) {
-		// cout << "essential num:" << essential.size() << endl;
-		// cout << "non-essential num:" << non_essential.size() << endl;
-
-		find_essential = false;
-		// fault sim non-essential patterns without fault drop
-		bool essential_index[non_essential.size()];
-		for (int i = non_essential.size() - 1; i >= 0; i--) {
-			essential_index[i] = false;
-			tdfault_sim_a_vector(non_essential[i], current_detect_num, false, i);
-		}
-		// find essential pattern
-		for (fptr f: flist_undetect) {
-			// cout << f->index << ' ' << f->detect << ' ' << f->detected_time << ' ' << f->pattern.size()<< endl; 
-			if (f->detect == TRUE ) {
-				if (f->detected_time == detected_num) {
-					find_essential = true;
-					essential_fault++;
-					for (int i = 0; i < f->pattern.size(); i++)	 
-						essential_index[f->pattern[i]] = true;
-				} 
-				f->detected_time = 0;
-				f->detect = FALSE;
-				f->pattern.clear();
-			} else {
-				// f->detect = REDUNDANT;
-			}
-		}
-		for (int i = non_essential.size() - 1; i >= 0; i--) {
-			if (essential_index[i]) {
-				// cout << non_essential[i] << endl;
-				essential.push_back(non_essential[i]);
-				non_essential.erase(non_essential.begin()+i);
-			}
-		}
-		// fault sim essential patterns with fault drop
-		if (!find_essential) break;
-		for (int i = essential.size() - 1; i >= 0; i--) {
-			tdfault_sim_a_vector(essential[i], current_detect_num);
+	// fault sim non-essential patterns without fault drop
+	bool essential_index[non_essential.size()];
+	bool remove_index[non_essential.size()];
+	for (int i = non_essential.size() - 1; i >= 0; i--) {
+		essential_index[i] = false;
+		bool redundant = tdfault_sim_a_vector(non_essential[i], current_detect_num, false, i);
+		remove_index[i] = redundant;
+	}
+	// find essential pattern
+	for (fptr f: flist_undetect) {
+		// cout << f->index << ' ' << f->detect << ' ' << f->detected_time << ' ' << f->pattern.size()<< endl; 
+		if (f->detect == TRUE ) {
+			if (f->detected_time == detected_num) {
+				find_essential = true;
+				essential_fault++;
+				for (int i = 0; i < f->pattern.size(); i++)	 
+					essential_index[f->pattern[i]] = true;
+			} 
+		} else {
+			f->detect = REDUNDANT;
 		}
 	}
-	// cout << "essential fault:" << essential_fault << endl;
+	for (int i = non_essential.size() - 1; i >= 0; i--) {
+		if (essential_index[i]) {
+			// cout << non_essential[i] << endl;
+			essential.push_back(non_essential[i]);
+			non_essential.erase(non_essential.begin()+i);
+		} else if (remove_index[i]){
+			non_essential.erase(non_essential.begin()+i);
+		}
+	}
+
 
 	// detect non-essential fault by reverse order and random order
 	vectors.clear();
@@ -146,12 +115,6 @@ void ATPG::static_test_compress() {
 		if (remove_pattern==0) converge++;
 		else converge = 0;
 	}
-	
-	// print vector
-	// for (int i = vectors.size() - 1; i >= 0; i--) {
-	// 	fprintf(stdout, "T\'%s\'\n", vectors[i].c_str());
-	// }
-	// in_vector_no = vectors.size();
 
 	// end = time(NULL);
 	// cout << "time for ordering : " << end-start << endl;
