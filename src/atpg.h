@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 
 #define HASHSIZE 3911
 
@@ -230,6 +231,8 @@ class ATPG {
   void dynamic_test_compress(int &current_backtracks);
   fptr get_second_fault();
   vector<int> tdf_vec;
+  default_random_engine rand_gen;
+  int atpg_iter;
 
   // defined in stc.cpp
   void static_test_compress();

@@ -25,7 +25,7 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
         // terminate dtc if no more fault to choose
         if(second_fault==nullptr) break;
         num_tried_fault++;
-        if(num_tried_fault >= max_fault) break;
+        // if(num_tried_fault >= max_fault) break;
         // load v2
         i = 0;
         for(wptr pi : cktin){
@@ -66,6 +66,8 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
         }
         tdf_vec = tmp_vec;
     }
+
+    // clear dtc mark
     for(fptr f: flist_undetect){
         f->dtc_tried = false;
     }
@@ -74,32 +76,34 @@ void ATPG::dynamic_test_compress(int &current_backtracks)
 ATPG::fptr ATPG::get_second_fault()
 {
     int i = 0;
-    int j = 0;
     bool _fail;
     vector<int> tmp_vec = tdf_vec;
     // analyze x-rate
-    // double x_rate = 0.;
-    // for(int b: tmp_vec){
-    //     if(b==U) x_rate += 1.;
-    // }
-    // x_rate = x_rate/(double)tmp_vec.size();
+    double x_rate = 0.;
+    for(int b: tmp_vec){
+        if(b==U) x_rate += 1.;
+    }
+    x_rate = x_rate/(double)tmp_vec.size();
     // double alpha = 3.;
-    // double slope = 0.15;
-    // double choose_prob = 100.*(0.1-slope*(1.-x_rate));
+    // double slope = 1;
+    // double choose_prob = 100.*(0.8-slope*(1.-x_rate));
     // double choose_prob = 100.*exp(-alpha*(1.-x_rate));
-    // if(choose_prob < 0.01) return nullptr;
+    if(x_rate < 0.03) return nullptr;
+
+    // uniform_real_distribution<double> threshold_dist(10., 20.);
+    // double choose_threshold = threshold_dist(rand_gen);
+    // uniform_real_distribution<double> rand_dist(0., 100.);
 
     for(fptr fault : flist_undetect){
     	_fail = false;
         // cout<<"DTC on fault #"<<fault->index<<endl;
-        if(fault->dtc_tried == true){
-            // cout<<"fault already tried"<<endl;
-            continue;
-        }
-        // int choose = rand() % 100;
-        int choose = rand() % 40;
-        // if(choose > choose_prob) continue;
-        if(choose != 0) continue;
+        if(fault->dtc_tried == true) continue;
+        if(fault->detected_time != atpg_iter) continue;
+        // if(fault->detected_time > atpg_iter) continue;
+
+        // double choose = rand_dist(rand_gen);
+        // if(choose > choose_threshold) continue;
+
         fault->dtc_tried = true;
 
     	// cout<<"get faulty wire"<<endl;
@@ -132,10 +136,8 @@ ATPG::fptr ATPG::get_second_fault()
 		sim();
 
 		// cout<<"check conflict"<<endl;
-		reverse_fault_type(fault);
-		_fail = conflict(fault->fault_type, faulty_w->value);
-		reverse_fault_type(fault);
-		if(_fail)	continue;
+		// _fail = conflict(!fault->fault_type, faulty_w->value);
+		// if(_fail)	continue;
 
 		// cout<<"trace x path"<<endl;
 		_fail = !trace_unknown_path(faulty_w);

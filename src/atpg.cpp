@@ -122,7 +122,8 @@ ATPG::ATPG() {
     // for tdfatpg
     tdf_atpg_flag = false;
     compress_flag = false;
-    srand(0);
+    this->rand_gen = default_random_engine(0);
+    atpg_iter = 0;
 }
 
 /* constructor of WIRE */

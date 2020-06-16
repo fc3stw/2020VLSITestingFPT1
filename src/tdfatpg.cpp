@@ -18,11 +18,12 @@ void ATPG::tdf_test() {
     int no_of_calls = 0;
 
     fptr fault_under_test = flist_undetect.front();
+    fault_under_test->test_tried = true;
 
     /* test generation mode */
     /* Figure 5 in the PODEM paper */
-    int iter = 0;
-    while (fault_under_test != nullptr) {
+    atpg_iter = 0;
+    while (atpg_iter < detected_num) {
         switch (gen_tdf_vector(fault_under_test, current_backtracks)) {
             case TRUE:
                 /* form a vector */
@@ -64,30 +65,32 @@ void ATPG::tdf_test() {
 
             case MAYBE:
                 no_of_aborted_faults++;
+                // cout<<"exceed backtrack limits\n";
                 break;
         }
-        fault_under_test->test_tried = true;
-        fault_under_test = nullptr;
+
         bool all_tried = true;
         for (fptr fptr_ele: flist_undetect) {
-            if (!fptr_ele->test_tried) {
+            if (!fptr_ele->test_tried && fptr_ele->detected_time==atpg_iter) {
+            // if (!fptr_ele->test_tried && (fptr_ele->detected_time==atpg_iter || fptr_ele->detected_time+1==atpg_iter)) {
                 fault_under_test = fptr_ele;
+                fault_under_test->test_tried = true;
                 all_tried = false;
                 break;
             }
         }
         total_no_of_backtracks += current_backtracks; // accumulate number of backtracks
         no_of_calls++;
+        if(flist_undetect.empty()) break;
+
         // retry for another iteration
         if(all_tried){
             for(fptr fptr_ele: flist_undetect){
                 fptr_ele->test_tried = false;
             }
-            iter++;
-            if(flist_undetect.empty()) break;
+            atpg_iter++;
             fault_under_test = flist_undetect.front();
         }
-        if(iter == detected_num) break;
     }
 
     display_undetect();
@@ -108,6 +111,8 @@ void ATPG::tdf_test() {
     // tdfsim
     total_detect_num = 0;
     flist_undetect.clear();
+    flist_undetect.clear();
+    flist.clear();
     generate_tdfault_list();
     transition_delay_fault_simulation(total_detect_num, false);
 

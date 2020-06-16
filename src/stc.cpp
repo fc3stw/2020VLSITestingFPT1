@@ -89,14 +89,16 @@ void ATPG::static_test_compress() {
 	int iter = 0;
 	int remove_pattern = -1;
 	int converge = 0;
-	int conv_limit = 10;
+	int conv_limit = 2;
 	while (converge < conv_limit) {
 		remove_pattern = 0;
 		gen_flist_undetect();
 
 		vector<string> vectors_new;
 		while (!vectors.empty()) {
-			int index = rand()%vectors.size();
+			uniform_real_distribution<double> unif(0, vectors.size());
+			// int index = rand()%vectors.size();
+			int index = floor(unif(rand_gen));
 			bool redundant = tdfault_sim_a_vector(vectors[index], current_detect_num);
 			// total_detect_num += current_detect_num;
 			// fprintf(stdout, "vector[%d] detects %d faults (%d)\n", i, current_detect_num, total_detect_num);

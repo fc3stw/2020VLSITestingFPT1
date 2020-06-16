@@ -219,10 +219,10 @@ bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect, 
     // n-detect
     // if the fault is detected, undo the detection count if the fault::detected_time < atpg::detected_num
     // and the pattern is not redundant
-    if(f->detect == true){
+    if(f->detect == TRUE){
       f->detected_time++;
       redundant_pattern = false;
-      if(f->detected_time < detected_num) f->detect = false;
+      if(f->detected_time < detected_num) f->detect = FALSE;
       // for essential fault
       if(!fault_drop && (f->detected_time <= detected_num)) {
         f->pattern.push_back(pattern_index);
@@ -286,7 +286,7 @@ bool ATPG::tdfault_sim_a_vector2(const string &vec, int &num_of_current_detect, 
           if(simulated_fault_list[i]->detect == TRUE){
             simulated_fault_list[i]->detected_time++;
             redundant_pattern = false;
-            if(simulated_fault_list[i]->detected_time < detected_num) simulated_fault_list[i]->detect = false;
+            if(simulated_fault_list[i]->detected_time < detected_num) simulated_fault_list[i]->detect = FALSE;
             // for essential fault
             if(!fault_drop && (simulated_fault_list[i]->detected_time <= detected_num)) {
               simulated_fault_list[i]->pattern.push_back(pattern_index);

@@ -13,10 +13,13 @@ int ATPG::gen_tdf_vector(const fptr fault, int &current_backtracks)
 {
     int gen_result = FALSE;
     int i = 0;
+    int no_of_backtracks = 0;
     tdf_vec = vector<int>(cktin.size()+1, U);
 
     // generate v2 for equivalent SAF of TDF
     gen_result = tdf_podem(fault, current_backtracks, true);
+    no_of_backtracks += current_backtracks;
+    current_backtracks = no_of_backtracks;
     if (gen_result != TRUE) return gen_result;
     // collect v2
     i = 0;
@@ -38,6 +41,8 @@ int ATPG::gen_tdf_vector(const fptr fault, int &current_backtracks)
     // complete v1 to activate TDF
     reverse_fault_type(fault);
     gen_result = tdf_podem_activate(fault, current_backtracks, false);
+    no_of_backtracks += current_backtracks;
+    current_backtracks = no_of_backtracks;
     reverse_fault_type(fault);
     if (gen_result != TRUE) return gen_result;
     // collect v1
@@ -52,9 +57,9 @@ int ATPG::gen_tdf_vector(const fptr fault, int &current_backtracks)
         dynamic_test_compress(current_backtracks);
     }
 
-    // random fill
+    uniform_real_distribution<double> rand01(0., 2.);
     for (int &b : tdf_vec){
-        if (b == U) b = rand() % 2;
+        if (b == U) b = floor(rand01(rand_gen));
     }
 
     return TRUE;
@@ -76,6 +81,7 @@ int ATPG::tdf_podem(const fptr fault, int &current_backtracks, bool clear_input)
         for (i = 0; i < sort_wlist.size(); i++){
             sort_wlist[i]->value = U;
         }
+        sim();
     }
 
     no_of_backtracks = 0;
@@ -158,46 +164,7 @@ int ATPG::tdf_podem(const fptr fault, int &current_backtracks, bool clear_input)
             if (check_test())
             {
                 find_test = true;
-                /* if multiple patterns per fault, print out every test cube */
-                if (total_attempt_num > 1)
-                {
-                    if (attempt_num == 0)
-                    {
-                        display_fault(fault);
-                    }
-                    display_io();
-                }
                 attempt_num++; // increase pattern count for this fault
-
-                /* keep trying more PI assignments if we want multiple patterns per fault
-         * this is not in the original PODEM paper*/
-                if (total_attempt_num > attempt_num)
-                {
-                    wpi = nullptr;
-                    while (!decision_tree.empty() && (wpi == nullptr))
-                    {
-                        /* backtrack */
-                        if (decision_tree.front()->is_all_assigned())
-                        {
-                            decision_tree.front()->remove_all_assigned();
-                            decision_tree.front()->value = U;
-                            decision_tree.front()->set_changed();
-                            decision_tree.pop_front();
-                        }
-                        /* flip last decision */
-                        else
-                        {
-                            decision_tree.front()->value = decision_tree.front()->value ^ 1;
-                            decision_tree.front()->set_changed();
-                            decision_tree.front()->set_all_assigned();
-                            no_of_backtracks++;
-                            wpi = decision_tree.front();
-                        }
-                    }
-                    if (!wpi)
-                        no_test = true;
-                    goto again; // if we want multiple patterns per fault
-                }               // if total_attempt_num > attempt_num
             }                   // if check_test()
         }                       // again
     }                           // while (three conditions)
@@ -271,6 +238,7 @@ int ATPG::tdf_podem_activate(const fptr fault, int &current_backtracks, bool cle
         for (i = 0; i < sort_wlist.size(); i++){
             sort_wlist[i]->value = U;
         }
+        sim();
     }
 
     no_of_backtracks = 0;
@@ -285,6 +253,9 @@ int ATPG::tdf_podem_activate(const fptr fault, int &current_backtracks, bool cle
     {
     case TRUE: // if a  PI is assigned
         sim(); // Fig 7.3
+        // wfault = fault_evaluate(fault);
+        // if (wfault != nullptr)
+        //     forward_imply(wfault);
         if (is_activated(fault)){
             find_test = true;
         }
@@ -340,8 +311,12 @@ int ATPG::tdf_podem_activate(const fptr fault, int &current_backtracks, bool cle
                 no_test = true; //decision tree empty,  Fig 7.9
         }                       // no test possible
         sim();
+        // wfault = fault_evaluate(fault);
+        // if (wfault != nullptr)
+        //     forward_imply(wfault);
         if (is_activated(fault)){
             find_test = true;
+            attempt_num++; // increase pattern count for this fault
         }
     } // while (three conditions)
 
